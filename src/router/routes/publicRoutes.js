@@ -14,7 +14,7 @@ const publicRoutes = [
         element: <Register />
     },
     {
-        path: '/admin',
+        path: '/admin/login',
         element: <BackOffice />
     },
 ]

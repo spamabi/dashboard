@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux'
-import { admin_login } from '../../store/Reducers/authReducer';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
+import { admin_login, messageClear } from '../../store/Reducers/authReducer';
+import { PropagateLoader } from 'react-spinners'
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom'
 
 const BackOffice = () => {
 
-    const dispatch = useDispatch()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { loader, errorMessage, successMessage } = useSelector(state => state.auth)
 
     const [state, setState] = useState({
         email: "",
@@ -21,8 +26,28 @@ const BackOffice = () => {
     const submit = (e) => {
         e.preventDefault()
         dispatch(admin_login(state))
-        // console.log(state)
+        console.log(state)
     }
+
+    const overrideStyle = {
+        display: 'flex',
+        margin: '0 auto',
+        height: '24px',
+        justifyContent: 'center',
+        alignItem: 'center'
+    }
+
+    useEffect(() => {
+        if (errorMessage) {
+            toast.error(errorMessage)
+            dispatch(messageClear())
+        }
+        if (successMessage) {
+            toast.success(successMessage)
+            dispatch(messageClear())
+            navigate('/')
+        }
+    }, [errorMessage, successMessage])
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -81,10 +106,13 @@ const BackOffice = () => {
 
                     <div>
                         <button
+                            disabled={loader ? true : false}
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-black px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black-600"
                         >
-                            Log In
+                            {
+                                loader ? <PropagateLoader color='#fff' cssOverride={overrideStyle} /> : 'Log In'
+                            }
                         </button>
                     </div>
                 </form>
